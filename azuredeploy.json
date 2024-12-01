@@ -40,6 +40,19 @@
       ]
     },
     {
+      "type": "Microsoft.Web/sites/sourcecontrols",
+      "apiVersion": "2021-03-01",
+      "name": "[concat(parameters('webAppName'), '/web')]",
+      "properties": {
+        "repoUrl": "git@github.com:naikibro/links-up-supinfo.git",
+        "branch": "main",
+        "isManualIntegration": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    },
+    {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2021-02-01",
       "name": "[parameters('functionAppName')]",
@@ -118,7 +131,7 @@
       ],
       "properties": {
         "resource": {
-          "id": "linkusdb-cosmosdb"
+          "id": "[parameters('cosmosDbDatabaseName')]"
         }
       }
     },
@@ -171,7 +184,7 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "eastus"
+      "defaultValue": "westus"
     },
     "storageAccountConnectionString": {
       "type": "securestring"
@@ -181,6 +194,10 @@
     },
     "googleClientSecret": {
       "type": "securestring"
+    },
+    "repoBranch": {
+      "type": "string",
+      "defaultValue": "main"
     }
   }
 }

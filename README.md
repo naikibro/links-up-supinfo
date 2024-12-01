@@ -85,25 +85,36 @@ npm install && npm run dev
 
 ## 3 - Deployment
 
-Build the React app locally
+To automatize the deployment we recommend using Azure Github actions  
+synchronize your Azure web app with [this github](https://github.com/naikibro/tahiti-regenerative-travel) repository
 
 ```sh
-npm run build
-```
-
-Zip the build output
-
-```sh
-zip -r react-app.zip ./build
-```
-
-Deploy code to Azure Web App
-
-```sh
-az webapp deployment source config-zip \
-  --resource-group linksup-resources \
-  --name $WEB_APP_NAME \
-  --src ./react-app.zip
+az webapp deployment source config \
+    --name linksup-webapp \
+    --resource-group linksup-resources \
+    --repo-url https://github.com/naikibro/tahiti-regenerative-travel \
+    --branch main \
+    --manual-integration
 ```
 
 ## 4 - Architecture overview
+
+```
++----------------------------+
+|     Links Up Frontend      |
+|    (React + TypeScript)    |
++------------+---------------+
+             |
+             v
++----------------------------+
+|     Azure Web App         |
+| (Frontend Hosting Layer)  |
++------------+---------------+
+             |
+             v
++----------------------------+
+|   Azure Storage Account   |
+| (Blob storage for assets) |
++----------------------------+
+
+```
