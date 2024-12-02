@@ -1,4 +1,5 @@
 import "./App.css";
+import FileUpload from "./components/file-management/FileUpload";
 import logo from "/images/identity/logos/1.png";
 
 function App() {
@@ -16,6 +17,9 @@ function App() {
     >
       <img src={logo} alt="Logo" width={200} height={200} />
       <h2>The app to manage your social media files</h2>
+
+      <hr />
+      <FileUpload />
     </div>
   );
 }
