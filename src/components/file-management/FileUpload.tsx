@@ -1,13 +1,12 @@
 import { BlobServiceClient } from "@azure/storage-blob";
 import React, { useState } from "react";
-import { storageConfig } from "../../lib/azureGlobals";
 
 const FileUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>("");
 
   const blobServiceClient = new BlobServiceClient(
-    `https://${storageConfig.accountName}.blob.core.windows.net/?${storageConfig.sasToken}`
+    `https://linksupstorage.blob.core.windows.net/?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-12-11T10:45:17Z&st=2024-12-02T02:45:17Z&spr=https,http&sig=lLbKMKqxbYG%2B0IxUJFYU3pV8GYAdSOU3BCEJ57nexRQ%3D`
   );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +44,7 @@ const FileUpload: React.FC = () => {
 
   return (
     <div>
+      <a href="/.auth/login/github">Login</a>
       <h1>File Upload</h1>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleUpload}>Upload</button>
