@@ -21,8 +21,34 @@ interface FileRecord {
 const FileManager: React.FC = () => {
   const [files, setFiles] = useState<FileRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [userId, setUserId] = useState<string>("");
 
+  // Fetch authenticated user info
   useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("/.auth/me", { credentials: "include" });
+        if (response.ok) {
+          const data = await response.json();
+          const clientPrincipal = data?.clientPrincipal;
+          if (clientPrincipal?.userId) {
+            setUserId(clientPrincipal.userId);
+          }
+        } else {
+          console.error("Failed to fetch user info");
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  // Fetch files for the current user
+  useEffect(() => {
+    if (!userId) return;
+
     const fetchFiles = async () => {
       try {
         const { database } = await cosmosClient.databases.createIfNotExists({
@@ -32,7 +58,8 @@ const FileManager: React.FC = () => {
           id: containerId,
         });
         const query = {
-          query: "SELECT * FROM c",
+          query: "SELECT * FROM c WHERE c.authorId = @userId",
+          parameters: [{ name: "@userId", value: userId }],
         };
         const { resources } = await container.items
           .query<FileRecord>(query)
@@ -46,7 +73,7 @@ const FileManager: React.FC = () => {
     };
 
     fetchFiles();
-  }, []);
+  }, [userId]);
 
   const renderFile = (file: FileRecord) => {
     const fileType = file.type.split("/")[0];
