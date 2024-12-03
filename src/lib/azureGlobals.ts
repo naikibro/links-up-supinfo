@@ -1,15 +1,20 @@
 import { CosmosClient } from "@azure/cosmos";
 import { BlobServiceClient } from "@azure/storage-blob";
 
+const storageAccountName: string =
+  (import.meta.env.VITE_AZURE_STORAGE_ACCOUNT_NAME as string) ||
+  "linksupstorage";
+
+const sasToken: string =
+  (import.meta.env.VITE_AZURE_STORAGE_SAS_TOKEN as string) ||
+  "sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2025-12-11T10:45:17Z&st=2024-12-02T02:45:17Z&spr=https,http&sig=lLbKMKqxbYG%2B0IxUJFYU3pV8GYAdSOU3BCEJ57nexRQ%3D";
 export const storageConfig = {
-  accountName: import.meta.env.VITE_AZURE_STORAGE_ACCOUNT_NAME as string,
-  sasToken: import.meta.env.VITE_AZURE_STORAGE_SAS_TOKEN as string,
+  accountName: storageAccountName,
+  sasToken: sasToken,
 };
 
 export const blobServiceClient = new BlobServiceClient(
-  `https://${
-    import.meta.env.VITE_AZURE_STORAGE_ACCOUNT_NAME
-  }.blob.core.windows.net/?${import.meta.env.VITE_AZURE_STORAGE_SAS_TOKEN}`
+  `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
 );
 
 export const cosmosClient = new CosmosClient({
