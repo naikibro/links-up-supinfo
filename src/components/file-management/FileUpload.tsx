@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Alert,
   Box,
@@ -8,6 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import {
   blobServiceClient,
   containerId,
@@ -19,6 +19,24 @@ interface FileUploadProps {
   onUploadComplete?: () => void;
 }
 
+interface UserInfo {
+  userId: string;
+  userDetails: string;
+  identityProvider: string;
+  userRoles: string[];
+}
+
+interface FileRecord {
+  id: string;
+  fileName: string;
+  url: string;
+  uploadedAt: string;
+  size: number;
+  type: string;
+  author: string;
+  authorId: string;
+}
+
 const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>("");
@@ -27,23 +45,59 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
     "success"
   );
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-  // Handle file selection
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("/.auth/me", { credentials: "include" });
+        if (response.ok) {
+          const data = await response.json();
+          const clientPrincipal = data?.clientPrincipal;
+          if (clientPrincipal) {
+            setUserInfo({
+              userId: clientPrincipal.userId,
+              userDetails: clientPrincipal.userDetails,
+              identityProvider: clientPrincipal.identityProvider,
+              userRoles: clientPrincipal.userRoles,
+            });
+          } else {
+            console.error("ClientPrincipal missing in auth data.");
+            setUserInfo(null);
+          }
+        } else {
+          console.error("Failed to fetch user info");
+          setUserInfo(null);
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+        setUserInfo(null);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setFile(event.target.files[0]);
     }
   };
 
-  // Handle Snackbar Close
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
 
-  // Handle file upload
   const handleUpload = async () => {
     if (!file) {
       setMessage("Please select a file first.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    if (!userInfo) {
+      setMessage("User information not available. Please log in.");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
       return;
@@ -57,10 +111,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
       const uploadedFileName = `${timestamp}_${file.name}`;
 
-      // Ensure the container exists
       await containerClient.createIfNotExists();
 
-      // Upload the file
       const blobClient = containerClient.getBlockBlobClient(uploadedFileName);
       const fileArrayBuffer = await file.arrayBuffer();
       await blobClient.uploadData(fileArrayBuffer, {
@@ -69,7 +121,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
       const blobUrl = blobClient.url;
 
-      // Create a record in Cosmos DB
       const { database } = await cosmosClient.databases.createIfNotExists({
         id: databaseId,
       });
@@ -77,14 +128,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
         id: containerId,
       });
 
-      const record = {
+      const record: FileRecord = {
         id: uploadedFileName,
         fileName: file.name,
         url: blobUrl,
         uploadedAt: new Date().toISOString(),
         size: file.size,
         type: file.type,
-        author: "current-user",
+        author: userInfo.userDetails,
+        authorId: userInfo.userId,
       };
 
       await container.items.create(record);
@@ -92,7 +144,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
       setMessage(`File uploaded and record created successfully.`);
       setSnackbarSeverity("success");
 
-      // Notify parent of upload completion
       if (onUploadComplete) onUploadComplete();
     } catch (error) {
       setMessage(`Upload failed: ${error}`);

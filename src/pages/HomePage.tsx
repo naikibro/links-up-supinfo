@@ -56,7 +56,6 @@ const HomePage: React.FC = () => {
     <Box>
       <Navbar />
       <Container
-        maxWidth="sm"
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -84,86 +83,88 @@ const HomePage: React.FC = () => {
         {/* Divider */}
         <Divider sx={{ width: "100%", my: 4 }} />
 
-        {authenticated === null ? (
-          <CircularProgress />
-        ) : authenticated ? (
-          <>
-            {/* FileManager */}
-            <FileManager />
+        <Box maxWidth="sm">
+          {authenticated === null ? (
+            <CircularProgress />
+          ) : authenticated ? (
+            <>
+              {/* FileManager */}
+              <FileManager />
 
-            {/* FAB for opening the drawer */}
-            <Fab
-              color="primary"
-              aria-label="add"
-              variant="extended"
-              sx={{ position: "fixed", bottom: 16, right: 16 }}
-              onClick={() => toggleDrawer(true)}
-            >
-              <AddIcon />
-              <Typography>Add a media</Typography>
-            </Fab>
+              {/* FAB for opening the drawer */}
+              <Fab
+                color="primary"
+                aria-label="add"
+                variant="extended"
+                sx={{ position: "fixed", bottom: 16, right: 16 }}
+                onClick={() => toggleDrawer(true)}
+              >
+                <AddIcon />
+                <Typography>Add a media</Typography>
+              </Fab>
 
-            {/* Drawer for FileUpload */}
-            <Drawer
-              anchor="right"
-              open={drawerOpen}
-              onClose={() => toggleDrawer(false)}
-              sx={{
-                ".MuiDrawer-paper": {
-                  width: "100vw",
-                  height: "100vh",
-                  background: "rgba(255, 255, 255, 0.9)",
-                  backdropFilter: "blur(10px)",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                },
-              }}
-            >
-              <Box
+              {/* Drawer for FileUpload */}
+              <Drawer
+                anchor="right"
+                open={drawerOpen}
+                onClose={() => toggleDrawer(false)}
                 sx={{
-                  width: "100%",
-                  p: 4,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "white",
+                  ".MuiDrawer-paper": {
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(255, 255, 255, 0.9)",
+                    backdropFilter: "blur(10px)",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Typography variant="h6">Upload a New File</Typography>
-                  <IconButton onClick={() => toggleDrawer(false)} sx={{}}>
-                    <CloseIcon />
-                  </IconButton>
+                <Box
+                  sx={{
+                    width: "100%",
+                    p: 4,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Typography variant="h6">Upload a New File</Typography>
+                    <IconButton onClick={() => toggleDrawer(false)} sx={{}}>
+                      <CloseIcon />
+                    </IconButton>
+                  </Box>
+                  <FileUpload onUploadComplete={handleUploadComplete} />
                 </Box>
-                <FileUpload onUploadComplete={handleUploadComplete} />
-              </Box>
-            </Drawer>
-          </>
-        ) : (
-          <Box textAlign="center">
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Please log in to access your files and upload media.
-            </Typography>
-            <Button
-              href={`/.auth/login/github`}
-              variant="contained"
-              color="primary"
-              sx={{ mr: 2 }}
-            >
-              Login with GitHub
-            </Button>
-            <Button
-              href={`/.auth/login/aad`}
-              variant="contained"
-              color="secondary"
-            >
-              Login with Microsoft
-            </Button>
-          </Box>
-        )}
+              </Drawer>
+            </>
+          ) : (
+            <Box textAlign="center">
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Please log in to access your files and upload media.
+              </Typography>
+              <Button
+                href={`/.auth/login/github`}
+                variant="contained"
+                color="primary"
+                sx={{ mr: 2 }}
+              >
+                Login with GitHub
+              </Button>
+              <Button
+                href={`/.auth/login/aad`}
+                variant="contained"
+                color="secondary"
+              >
+                Login with Microsoft
+              </Button>
+            </Box>
+          )}
+        </Box>
       </Container>
     </Box>
   );
