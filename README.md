@@ -1,3 +1,5 @@
+![logo](./public/images/identity/logos/1.png)
+
 # Links Up !
 
 The solution for Social Media content management
@@ -78,6 +80,8 @@ use the convenience script to deploy the Azure Cloud Architecture for `Links Up`
 ```
 
 ### Run the frontend
+
+Launch your node server
 
 ```sh
 npm install && npm run dev

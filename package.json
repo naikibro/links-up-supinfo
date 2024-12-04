@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"vite\" \"swa start http://localhost:5173\"",
     "build": "tsc -b && vite build && cp -r ./dist build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -31,6 +31,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
     "dotenv": "^16.4.5",
     "eslint": "^9.15.0",
     "eslint-plugin-react-hooks": "^5.0.0",
