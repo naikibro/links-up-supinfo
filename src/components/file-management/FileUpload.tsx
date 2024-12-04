@@ -8,12 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import {
-  blobServiceClient,
-  containerId,
-  cosmosClient,
-  databaseId,
-} from "../../lib/azureGlobals";
+import { apiUrl } from "../../lib/azureGlobals";
 
 interface FileUploadProps {
   onUploadComplete?: () => void;
@@ -61,13 +56,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
               identityProvider: clientPrincipal.identityProvider,
               userRoles: clientPrincipal.userRoles,
             });
-          } else {
-            console.error("ClientPrincipal missing in auth data.");
-            setUserInfo(null);
           }
-        } else {
-          console.error("Failed to fetch user info");
-          setUserInfo(null);
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
@@ -105,47 +94,33 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
     setIsUploading(true);
     try {
-      const containerName = "files";
-      const containerClient =
-        blobServiceClient.getContainerClient(containerName);
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const uploadedFileName = `${timestamp}_${file.name}`;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append(
+        "userInfo",
+        JSON.stringify({
+          userId: userInfo.userId,
+          userDetails: userInfo.userDetails,
+        })
+      );
 
-      await containerClient.createIfNotExists();
-
-      const blobClient = containerClient.getBlockBlobClient(uploadedFileName);
-      const fileArrayBuffer = await file.arrayBuffer();
-      await blobClient.uploadData(fileArrayBuffer, {
-        blobHTTPHeaders: { blobContentType: file.type },
+      const response = await fetch(`${apiUrl}/files`, {
+        method: "POST",
+        body: formData,
       });
 
-      const blobUrl = blobClient.url;
-
-      const { database } = await cosmosClient.databases.createIfNotExists({
-        id: databaseId,
-      });
-      const { container } = await database.containers.createIfNotExists({
-        id: containerId,
-      });
-
-      const record: FileRecord = {
-        id: uploadedFileName,
-        fileName: file.name,
-        url: blobUrl,
-        uploadedAt: new Date().toISOString(),
-        size: file.size,
-        type: file.type,
-        author: userInfo.userDetails,
-        authorId: userInfo.userId,
-      };
-
-      await container.items.create(record);
-
-      setMessage(`File uploaded and record created successfully.`);
-      setSnackbarSeverity("success");
-
-      if (onUploadComplete) onUploadComplete();
+      if (response.ok) {
+        const data: FileRecord = await response.json();
+        setMessage(`File uploaded successfully: ${data.fileName}`);
+        setSnackbarSeverity("success");
+        if (onUploadComplete) onUploadComplete();
+      } else {
+        const errorData = await response.json();
+        setMessage(`Upload failed: ${errorData.message}`);
+        setSnackbarSeverity("error");
+      }
     } catch (error) {
+      console.error("Error uploading file:", error);
       setMessage(`Upload failed: ${error}`);
       setSnackbarSeverity("error");
     } finally {

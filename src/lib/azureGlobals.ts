@@ -23,3 +23,7 @@ export const cosmosClient = new CosmosClient({
 });
 export const databaseId = "linksupdb-sql";
 export const containerId = "uploads";
+
+export const apiUrl =
+  (import.meta.env.VITE_AZURE_API_URL as string) ||
+  "https://linksup-api-container.wonderfulwater-3a18bfc4.westus.azurecontainerapps.io/";
