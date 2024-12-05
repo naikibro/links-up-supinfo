@@ -70,14 +70,47 @@ const Navbar: React.FC = () => {
           justifyContent: "space-between",
         }}
       >
-        <Button
-          href="/"
-          color="inherit"
-          variant="outlined"
-          sx={{ textAlign: "left" }}
-        >
-          Links Up!
-        </Button>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            href="/feed"
+            color="inherit"
+            variant="outlined"
+            sx={{
+              textAlign: "left",
+              ":hover": {
+                border: "2px solid #ff4081",
+              },
+            }}
+          >
+            Links Up!
+          </Button>
+          <Button
+            href="/home"
+            color="inherit"
+            variant="text"
+            sx={{
+              textAlign: "left",
+              ":hover": {
+                borderBottom: "2px solid #ff4081",
+              },
+            }}
+          >
+            My files
+          </Button>
+          <Button
+            href="/feed"
+            color="inherit"
+            variant="text"
+            sx={{
+              textAlign: "left",
+              ":hover": {
+                borderBottom: "2px solid #ff4081",
+              },
+            }}
+          >
+            Public files
+          </Button>
+        </Box>
 
         {authenticated === null ? (
           <CircularProgress size={24} />
