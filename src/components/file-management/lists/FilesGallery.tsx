@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import {
-  List,
-  ListItem,
-  Button,
-  Box,
-  Modal,
-  Typography,
-  IconButton,
-} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import CloseIcon from "@mui/icons-material/Close";
+import {
+  Box,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  Modal,
+  Typography,
+} from "@mui/material";
+import React, { useState } from "react";
 import { FileRecord } from "../../../models/FileRecord";
 
 interface FilesGalleryProps {
@@ -32,10 +32,11 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
     <>
       <List
         sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          display: "flex",
+          flexWrap: "wrap",
           gap: 2,
-          padding: 0,
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         {files.map((file) => {
@@ -45,6 +46,8 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
             <ListItem
               key={file.id}
               sx={{
+                maxWidth: 350,
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -53,6 +56,13 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
                 position: "relative",
                 listStyle: "none",
                 backgroundColor: "#f9f9f9",
+                boxShadow: 2,
+                p: 0,
+                transition: "transform 0.3s, box-shadow 0.3s",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: 4,
+                },
               }}
             >
               {fileType === "image" ? (
@@ -64,6 +74,7 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
                     width: "100%",
                     height: "auto",
                     objectFit: "cover",
+                    maxHeight: "150px",
                   }}
                 />
               ) : fileType === "video" ? (
@@ -77,16 +88,36 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
                     width: "100%",
                     height: "auto",
                     objectFit: "cover",
+                    maxHeight: "150px",
+                  }}
+                />
+              ) : fileType === "audio" ? (
+                <Box
+                  component="audio"
+                  src={file.url}
+                  controls
+                  sx={{
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "cover",
+                    maxHeight: "150px",
                   }}
                 />
               ) : null}
               <Typography
-                variant="body1"
+                variant="body2"
                 gutterBottom
                 sx={{
-                  display: ["video", "image"].includes(file.type.split("/")[0])
-                    ? "none"
-                    : "block",
+                  mt: 1,
+                  fontSize: {
+                    xs: "0.75rem",
+                    sm: "0.875rem",
+                  },
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  width: "100%",
                 }}
               >
                 {file.fileName}
@@ -97,15 +128,22 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
                   display: "flex",
                   justifyContent: "space-between",
                   width: "100%",
-                  padding: 1,
+                  gap: 1,
+                  px: 2,
                 }}
               >
                 <Button
-                  variant="contained"
+                  variant="text"
                   color="primary"
                   href={file.url}
                   download
                   startIcon={<DownloadIcon />}
+                  sx={{
+                    fontSize: {
+                      xs: "0.7rem",
+                      sm: "0.85rem",
+                    },
+                  }}
                 >
                   Download
                 </Button>
@@ -114,6 +152,12 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
                   color="secondary"
                   onClick={() => handlePreviewFile(file)}
                   startIcon={<VisibilityIcon />}
+                  sx={{
+                    fontSize: {
+                      xs: "0.7rem",
+                      sm: "0.85rem",
+                    },
+                  }}
                 >
                   Preview
                 </Button>
@@ -136,6 +180,7 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
             p: 4,
             maxWidth: "90vw",
             maxHeight: "90vh",
+            width: "100%",
             overflow: "auto",
             borderRadius: 2,
           }}
@@ -154,8 +199,8 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: "100%",
-              width: "100%",
+              flexDirection: "column",
+              gap: 2,
             }}
           >
             {previewFile?.type.split("/")[0] === "image" ? (
@@ -167,6 +212,7 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
                   maxWidth: "100%",
                   maxHeight: "80vh",
                   objectFit: "contain",
+                  borderRadius: 2,
                 }}
               />
             ) : previewFile?.type.split("/")[0] === "video" ? (
@@ -179,9 +225,67 @@ const FilesGallery: React.FC<FilesGalleryProps> = ({ files }) => {
                   maxWidth: "100%",
                   maxHeight: "80vh",
                   objectFit: "contain",
+                  borderRadius: 2,
+                }}
+              />
+            ) : previewFile?.type.split("/")[0] === "audio" ? (
+              <Box
+                component="audio"
+                src={previewFile.url}
+                controls
+                sx={{
+                  maxWidth: "100%",
+                  maxHeight: "80vh",
+                  objectFit: "contain",
+                  borderRadius: 2,
                 }}
               />
             ) : null}
+
+            <Button
+              variant="text"
+              color="primary"
+              href={previewFile?.url}
+              startIcon={<DownloadIcon />}
+              sx={{
+                fontSize: {
+                  xs: "0.7rem",
+                  sm: "0.85rem",
+                },
+              }}
+            >
+              Download
+            </Button>
+
+            {/* Metadata Section */}
+            <Box
+              sx={{
+                width: "100%",
+                mt: 2,
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+                padding: 2,
+                backgroundColor: "#f0f0f0",
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="body1">
+                <strong>File Name:</strong> {previewFile?.fileName}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Uploaded At:</strong> {previewFile?.uploadedAt}
+              </Typography>
+              <Typography variant="body1">
+                <strong>Author:</strong> {previewFile?.author}
+              </Typography>
+              {previewFile?.isPublished !== undefined && (
+                <Typography variant="body1">
+                  <strong>Published:</strong>{" "}
+                  {previewFile.isPublished ? "Yes" : "No"}
+                </Typography>
+              )}
+            </Box>
           </Box>
         </Box>
       </Modal>
