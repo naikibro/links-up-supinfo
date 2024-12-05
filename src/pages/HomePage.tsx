@@ -83,7 +83,7 @@ const HomePage: React.FC = () => {
         {/* Divider */}
         <Divider sx={{ width: "100%", my: 4 }} />
 
-        <Box maxWidth="sm">
+        <Box>
           {authenticated === null ? (
             <CircularProgress />
           ) : authenticated ? (

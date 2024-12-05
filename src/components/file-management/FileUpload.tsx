@@ -2,6 +2,8 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   LinearProgress,
   Snackbar,
   TextField,
@@ -9,27 +11,11 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { apiUrl } from "../../lib/azureGlobals";
+import { FileRecord } from "../../models/FileRecord";
+import { UserInfo } from "../../models/UserInfo";
 
 interface FileUploadProps {
   onUploadComplete?: () => void;
-}
-
-interface UserInfo {
-  userId: string;
-  userDetails: string;
-  identityProvider: string;
-  userRoles: string[];
-}
-
-interface FileRecord {
-  id: string;
-  fileName: string;
-  url: string;
-  uploadedAt: string;
-  size: number;
-  type: string;
-  author: string;
-  authorId: string;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
@@ -41,6 +27,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
     "success"
   );
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [isPublished, setIsPublished] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -69,7 +56,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setFile(event.target.files[0]);
+      const selectedFile = event.target.files[0];
+      setFile(selectedFile);
+      setMessage(`Selected file: ${selectedFile.name}`);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
     }
   };
 
@@ -94,29 +85,50 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
 
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append(
-        "userInfo",
-        JSON.stringify({
+      const fileBuffer = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve((reader.result as string).split(",")[1]);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+
+      const payload = {
+        fileName: file.name,
+        fileType: file.type,
+        fileBuffer,
+        isPublished,
+        userInfo: {
           userId: userInfo.userId,
           userDetails: userInfo.userDetails,
-        })
-      );
+        },
+      };
 
       const response = await fetch(`${apiUrl}/files`, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        const data: FileRecord = await response.json();
-        setMessage(`File uploaded successfully: ${data.fileName}`);
-        setSnackbarSeverity("success");
-        if (onUploadComplete) onUploadComplete();
+        const contentType = response.headers.get("Content-Type");
+        if (contentType && contentType.includes("application/json")) {
+          const data: FileRecord = await response.json();
+          setMessage(`File uploaded successfully: ${data.fileName}`);
+          setSnackbarSeverity("success");
+          if (onUploadComplete) onUploadComplete();
+        } else {
+          setMessage("Upload succeeded but unexpected response format.");
+          setSnackbarSeverity("error");
+        }
       } else {
-        const errorData = await response.json();
-        setMessage(`Upload failed: ${errorData.message}`);
+        try {
+          const errorData = await response.json();
+          setMessage(`Upload failed: ${errorData.message}`);
+        } catch {
+          setMessage("Upload failed: Unable to parse error response.");
+        }
         setSnackbarSeverity("error");
       }
     } catch (error) {
@@ -144,7 +156,18 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadComplete }) => {
           onChange={handleFileChange}
         />
       </Box>
-
+      <Box sx={{ mb: 2, textAlign: "left" }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isPublished}
+              onChange={(e) => setIsPublished(e.target.checked)}
+              color="primary"
+            />
+          }
+          label="Upload as visible to anyone"
+        />
+      </Box>
       <Button
         variant="contained"
         color="primary"
