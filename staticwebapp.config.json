@@ -13,6 +13,20 @@
         "trace",
         "patch"
       ]
+    },
+    {
+      "route": "/home",
+      "methods": [
+        "get",
+        "head",
+        "post",
+        "put",
+        "delete",
+        "connect",
+        "trace",
+        "patch",
+        "options"
+      ]
     }
   ]
 }
