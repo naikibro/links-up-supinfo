@@ -19,6 +19,7 @@ import Navbar from "../components/navbar/Navbar";
 import { apiUrl } from "../lib/azureGlobals";
 import { FileRecord } from "../models/FileRecord";
 import logo from "/images/identity/logos/1.png";
+import AnonymousPublicFiles from "../components/anonymous/AnonymousPublicFiles";
 
 const PublicFeedPage: React.FC = () => {
   // constants
@@ -91,7 +92,12 @@ const PublicFeedPage: React.FC = () => {
   }, []);
 
   return (
-    <Box>
+    <Box
+      sx={{
+        height: "100%",
+        mb: 4,
+      }}
+    >
       <Navbar />
       <Container
         sx={{
@@ -115,13 +121,37 @@ const PublicFeedPage: React.FC = () => {
           component="h2"
           sx={{ mt: 4, mb: 2, textAlign: "center" }}
         >
-          PUBLICLY AVAILABLE FILES
+          {authenticated
+            ? "PUBLICLY AVAILABLE FILES"
+            : "Discover the best media for your Content creation"}
+        </Typography>
+
+        <Typography
+          variant="h6"
+          component="h2"
+          color="secondary"
+          sx={{ mt: 4, mb: 2, textAlign: "center" }}
+        >
+          {authenticated
+            ? "Discover what other creators want to share with you !"
+            : "Login to access all of our public content for FREE$"}
         </Typography>
 
         {/* Divider */}
         <Divider sx={{ width: "100%", my: 4 }} />
 
-        <Box maxWidth="sm">
+        <Box
+          sx={{
+            display: authenticated ? "none" : "block",
+          }}
+        >
+          <AnonymousPublicFiles files={publishedFiles} />
+        </Box>
+        <Box
+          sx={{
+            display: authenticated ? "block" : "none",
+          }}
+        >
           {loading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <Skeleton

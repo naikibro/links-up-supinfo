@@ -1,20 +1,22 @@
+import React, { useEffect, useState } from "react";
 import {
   Box,
   CircularProgress,
-  Divider,
-  List,
-  ListItem,
+  Tabs,
+  Tab,
   Typography,
+  Divider,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import { apiUrl } from "../../lib/azureGlobals";
 import { FileRecord } from "../../models/FileRecord";
-import { FileItem } from "./preview/FileItem";
+import PrivatesFilesGallery from "./private/PrivateFilesGallery";
+import PrivateFilesList from "./private/PrivateFilesList";
 
 const FileManager: React.FC = () => {
   const [files, setFiles] = useState<FileRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<number>(0);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -100,28 +102,29 @@ const FileManager: React.FC = () => {
       <Typography variant="h5" gutterBottom>
         All My Files
       </Typography>
-      <List>
-        {files.map((file) => (
-          <React.Fragment key={file.id}>
-            <ListItem
-              component="div"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                transition: "transform 0.3s",
-                cursor: "pointer",
-              }}
-            >
-              <FileItem
-                file={file}
-                onDelete={handleDelete}
-                onTogglePublish={handleTogglePublish}
-              />
-            </ListItem>
-            <Divider />
-          </React.Fragment>
-        ))}
-      </List>
+      <Tabs
+        value={activeTab}
+        onChange={(_e, newValue) => setActiveTab(newValue)}
+        sx={{ mb: 2 }}
+      >
+        <Tab label="List View" />
+        <Tab label="Gallery View" />
+      </Tabs>
+      <Divider />
+      {activeTab === 0 && (
+        <PrivateFilesList
+          files={files}
+          onDelete={handleDelete}
+          onTogglePublish={handleTogglePublish}
+        />
+      )}
+      {activeTab === 1 && (
+        <PrivatesFilesGallery
+          files={files}
+          onDelete={handleDelete}
+          onTogglePublish={handleTogglePublish}
+        />
+      )}
     </Box>
   );
 };

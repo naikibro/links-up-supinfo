@@ -67,10 +67,10 @@ const Navbar: React.FC = () => {
       <Toolbar
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: authenticated ? "space-between" : "flex-end",
         }}
       >
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: authenticated ? "flex" : "none", gap: 2 }}>
           <Button
             href="/feed"
             color="inherit"

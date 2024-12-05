@@ -1,14 +1,20 @@
+import React from "react";
+import { Box, Button, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
-import { Box, Button, Typography } from "@mui/material";
-import React from "react";
 import { FileRecord } from "../../../models/FileRecord";
 
-export const FileItem: React.FC<{
+interface FileItemProps {
   file: FileRecord;
   onDelete: (id: string) => void;
   onTogglePublish: (id: string, isPublished: boolean) => void;
-}> = ({ file, onDelete, onTogglePublish }) => {
+}
+
+const FileItem: React.FC<FileItemProps> = ({
+  file,
+  onDelete,
+  onTogglePublish,
+}) => {
   const fileType = file.type.split("/")[0];
 
   return (
@@ -22,44 +28,32 @@ export const FileItem: React.FC<{
         mb: 2,
       }}
     >
-      <Box
-        sx={{
-          flex: 1,
-          justifyContent: "space-evenly",
-          alignItems: "center",
-          gap: 2,
-        }}
-      >
-        {fileType === "image" && (
-          <img
-            src={file.url}
-            alt={file.fileName}
-            style={{
-              maxWidth: "100%",
-              height: "auto",
-              borderRadius: 10,
-              transition: "transform 0.3s",
-            }}
-          />
-        )}
-        {fileType === "video" && (
-          <video
-            src={file.url}
-            controls
-            style={{
-              maxWidth: "100%",
-              borderRadius: 10,
-              transition: "transform 0.3s",
-            }}
-          />
-        )}
-        {fileType === "audio" && (
-          <audio src={file.url} controls style={{ width: "100%" }} />
-        )}
+      {fileType === "image" && (
+        <img
+          src={file.url}
+          alt={file.fileName}
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+            borderRadius: 10,
+          }}
+        />
+      )}
+      {fileType === "video" && (
+        <video
+          src={file.url}
+          controls
+          style={{
+            maxWidth: "100%",
+            borderRadius: 10,
+          }}
+        />
+      )}
+      <Box>
+        <Typography variant="subtitle1" gutterBottom>
+          {file.fileName}
+        </Typography>
         <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            {file.fileName}
-          </Typography>
           <Button
             variant="text"
             href={file.url}
@@ -90,3 +84,5 @@ export const FileItem: React.FC<{
     </Box>
   );
 };
+
+export default FileItem;
