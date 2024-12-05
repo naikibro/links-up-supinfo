@@ -1,12 +1,6 @@
 {
   "routes": [
     {
-      "route": "/home",
-      "methods": [
-        "get"
-      ]
-    },
-    {
       "route": "/feed",
       "methods": [
         "get",
