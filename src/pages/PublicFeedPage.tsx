@@ -12,14 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import AnonymousPublicFiles from "../components/anonymous/AnonymousPublicFiles";
 import FileUpload from "../components/file-management/FileUpload";
 import PublicFiles from "../components/file-management/lists/PublicFiles";
 import { FilePreview } from "../components/file-management/preview/FilePreview";
-import Navbar from "../components/navbar/Navbar";
 import { apiUrl } from "../lib/azureGlobals";
 import { FileRecord } from "../models/FileRecord";
 import logo from "/images/identity/logos/1.png";
-import AnonymousPublicFiles from "../components/anonymous/AnonymousPublicFiles";
 
 const PublicFeedPage: React.FC = () => {
   // constants
@@ -98,7 +97,6 @@ const PublicFeedPage: React.FC = () => {
         mb: 4,
       }}
     >
-      <Navbar />
       <Container
         sx={{
           display: "flex",

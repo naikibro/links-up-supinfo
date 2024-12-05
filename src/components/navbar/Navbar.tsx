@@ -1,7 +1,11 @@
 import { AppBar, Box, Button, CircularProgress, Toolbar } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  setCurrentPage: (page: string) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ setCurrentPage }) => {
   const baseUrl =
     import.meta.env.VITE_ENV === "local"
       ? "http://localhost:4280"
@@ -85,7 +89,7 @@ const Navbar: React.FC = () => {
             Links Up!
           </Button>
           <Button
-            href="/home"
+            onClick={() => setCurrentPage("home")}
             color="inherit"
             variant="text"
             sx={{
@@ -98,7 +102,7 @@ const Navbar: React.FC = () => {
             My files
           </Button>
           <Button
-            href="/feed"
+            onClick={() => setCurrentPage("feed")}
             color="inherit"
             variant="text"
             sx={{

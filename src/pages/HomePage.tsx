@@ -2,20 +2,19 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
+  Button,
+  CircularProgress,
   Container,
   Divider,
   Drawer,
   Fab,
   IconButton,
   Typography,
-  Button,
-  CircularProgress,
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import FileManager from "../components/file-management/FileManager";
 import FileUpload from "../components/file-management/FileUpload";
 import logo from "/images/identity/logos/1.png";
-import Navbar from "../components/navbar/Navbar";
 
 const HomePage: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -54,7 +53,6 @@ const HomePage: React.FC = () => {
 
   return (
     <Box>
-      <Navbar />
       <Container
         sx={{
           display: "flex",
